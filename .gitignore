@@ -1,0 +1,11 @@
+# 构建产物（不提交）
+/dist*/
+/*.zip
+
+# 本地数据与日志
+/data/
+/启动失败.log
+
+# 系统与编辑器
+Thumbs.db
+.DS_Store
