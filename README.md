@@ -1,9 +1,12 @@
 # DeepSeek Harness 免安装便携版（Windows）构建工程
 
-本仓库是 DeepSeek Harness **Windows 免安装便携版**的**构建工程**，只包含源码与构建脚本，不含任何编译产物（exe / 二进制 / 依赖包）。
+DeepSeek Harness 的 Windows 免安装便携版：内置官方 Node.js 与全部程序包，解压后双击启动器即可使用，无需安装任何软件。
 
-- **想直接使用**：请到本仓库的 [Releases](https://github.com/sqs404/dsh-portable/releases) 下载打包好的成品（内置 Node.js 与全部程序包，解压后双击 `启动 DeepSeek Harness.exe` 即可使用，默认端口 3081）；
-- **想自己构建**：按下方「从源码构建」执行即可，产物与 Releases 一致。
+本仓库提供启动器源码（C#）、一键构建脚本与使用文档。
+
+## 快速使用
+
+从 [Releases](https://github.com/sqs404/dsh-portable/releases) 下载最新压缩包，解压后双击「启动 DeepSeek Harness.exe」即可使用（默认端口 3081）。
 
 ## 仓库内容
 
@@ -93,4 +96,3 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe ^
 
 - 官方项目：[deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)
 - 官方 npm 包：[`@deepseek-ai/dsh`](https://www.npmjs.com/package/@deepseek-ai/dsh)
-- 成品发行版：[Releases](https://github.com/sqs404/dsh-portable/releases)
