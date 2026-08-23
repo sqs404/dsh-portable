@@ -4,7 +4,7 @@
 //   1) 默认端口 3081；同目录 port.txt（纯数字）可覆盖
 //   2) 若端口已被本便携版实例占用 → 直接打开浏览器并退出（不重复启动）
 //   3) 设置 DSH_HOME 指向自身 data\（数据全部隔离在便携目录内）
-//   4) 启动内置 node.exe 运行 apps\cli\lib\bin.js web --port <端口>
+//   4) 启动内置 node.exe 运行 node_modules\@deepseek-ai\dsh\lib\bin.js web --port <端口>
 //   5) 轮询端口就绪后再打开浏览器（首次启动自动初始化 profile，等待更久）
 //   6) 若 node 在就绪前就退出 → 弹窗显示退出码与手动排查命令
 //   7) 等待 node 退出（关闭黑色命令行窗口即停止服务）
@@ -96,7 +96,7 @@ static class DshLauncher
             {
                 Fail("DeepSeek Harness 启动失败（进程提前退出，退出码 " + p.ExitCode + "）。\n\n"
                     + "请关闭黑色命令行窗口后，在命令行手动执行查看错误详情：\n"
-                    + "  node.exe apps\\cli\\lib\\bin.js web --port " + port.ToString());
+                    + "  node.exe node_modules\\@deepseek-ai\\dsh\\lib\\bin.js web --port " + port.ToString());
                 return p.ExitCode;
             }
             Thread.Sleep(1000);
