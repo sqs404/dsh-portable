@@ -144,10 +144,15 @@ Ok "大小: $([math]::Round((Get-ChildItem $OutDir -Recurse -File -Force | Measu
 if ($Zip) {
     Step "打包 zip"
     $zipPath = Join-Path $scriptDir "DeepSeek-Harness-Portable-$DshVersion.zip"
-    $parent = Split-Path $OutDir -Parent
-    $name = Split-Path $OutDir -Leaf
-    tar.exe -a -c -f $zipPath -C $parent $name
-    if ($LASTEXITCODE -ne 0) { Write-Host "打包失败" -ForegroundColor Red; exit 1 }
+    # 用 .NET ZipFile 而非系统 tar.exe：
+    #   tar.exe 生成的 zip 不设 UTF-8 标志，中文文件名（启动 DeepSeek Harness.exe、
+    #   使用说明.txt）会按本地代码页识别，解压后乱码；.NET ZipFile 以 UTF-8 写入
+    #   条目名并置 UTF-8 标志，任何解压工具均正常。
+    #   同时仅打包 dist 内容本身（不含 dist/ 顶层目录），解压即用。
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($OutDir, $zipPath)
+    if (-not (Test-Path $zipPath)) { Write-Host "打包失败" -ForegroundColor Red; exit 1 }
     Ok "zip: $zipPath ($([math]::Round((Get-Item $zipPath).Length / 1MB)) MB)"
 }
 
