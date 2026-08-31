@@ -16,13 +16,19 @@
     Node.js 版本，默认 v24.19.0。
 
 .PARAMETER DshVersion
-    官方 dsh 包版本，默认 0.1.1-rc.2。
+    官方 dsh 包版本，默认 0.1.2-alpha.2（官方最新版）。
+    如需回退到 latest 标签版本，传 -DshVersion "0.1.1-rc.2"。
 
 .PARAMETER Registry
     npm 镜像源。国内网络可传 https://registry.npmmirror.com/。
 
 .PARAMETER NodeMirror
     Node.js 下载镜像。国内网络可传 https://npmmirror.com/mirrors/node/。
+
+.PARAMETER CacheDir
+    npm 缓存目录，默认 <临时目录>\dsh-build-work\npm-cache。
+    受限环境（企业终端管控导致 AppData 不可写）下 npm 默认缓存会 EPERM 失败，
+    故默认改用构建临时目录。
 
 .PARAMETER OutDir
     输出目录，默认 <脚本目录>\dist。
@@ -42,9 +48,10 @@
 #>
 param(
     [string]$NodeVersion = "v24.19.0",
-    [string]$DshVersion = "0.1.1-rc.2",
+    [string]$DshVersion = "0.1.2-alpha.2",
     [string]$Registry = "https://registry.npmjs.org/",
     [string]$NodeMirror = "https://nodejs.org/dist/",
+    [string]$CacheDir = "",
     [string]$OutDir = "",
     [switch]$Zip
 )
@@ -106,6 +113,12 @@ if (-not (Test-Path (Join-Path $nmDir "@deepseek-ai\dsh\lib\bin.js"))) {
     $npm = Join-Path $nodeRoot "npm.cmd"
     $env:PATH = "$nodeRoot;$env:PATH"
     $env:npm_config_registry = $Registry
+    # npm 缓存默认落在 %LocalAppData%\npm-cache，企业终端管控机器上常因不可写而 EPERM，
+    # 这里默认改到构建临时目录（可用 -CacheDir 覆盖）。
+    if ([string]::IsNullOrWhiteSpace($CacheDir)) { $CacheDir = Join-Path $work "npm-cache" }
+    New-Item -ItemType Directory -Path $CacheDir -Force | Out-Null
+    $env:npm_config_cache = $CacheDir
+    Ok "npm 缓存: $CacheDir"
     $oldCwd = (Get-Location).Path
     Set-Location $OutDir
     try {

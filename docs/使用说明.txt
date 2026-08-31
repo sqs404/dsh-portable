@@ -23,6 +23,12 @@ DeepSeek Harness 的 Windows 免安装版：
 启动后会自动打开浏览器访问 http://127.0.0.1:3081
 （若未自动打开，请手动在浏览器输入该地址）
 
+注意：新版 DeepSeek Harness 的网页启用了一次性 token 鉴权，
+直接用裸地址访问可能提示 401。启动器会自动从程序输出里取到带 token 的
+地址并打开它，登录一次后浏览器会保存 30 天有效的会话 cookie，
+之后正常双击启动即可。若确实需要手动取地址，
+打开同目录 dsh-console.log，找以「dsh web:」开头的那一行。
+
 关闭方法：关闭启动时出现的黑色命令行窗口，即可停止服务。
 
 若启动失败，会弹出提示窗口并给出排查命令；
@@ -45,7 +51,8 @@ DeepSeek Harness 的 Windows 免安装版：
   node.exe                   内置 Node.js 运行时（v24.19.0）
   node_modules\              全部程序包（npm 扁平安装，452 包 / 187 个顶层包）
   data\                      用户数据（配置、Key、会话；首次启动自动生成）
-  package.json               运行时清单（@deepseek-ai/dsh@0.1.1-rc.2）
+  package.json               运行时清单（@deepseek-ai/dsh@0.1.2-alpha.2）
+  dsh-console.log            程序运行日志（每次启动覆盖，启动失败时看它）
   LICENSE / THIRD_PARTY_NOTICES.md   许可证与第三方声明
   README.md / 使用说明.txt    使用文档
 

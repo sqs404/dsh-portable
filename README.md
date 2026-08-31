@@ -46,7 +46,8 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -Zip `
 脚本执行：
 
 1. 下载官方 **Node.js**（默认 v24.19.0）并取出 `node.exe`；
-2. 用 npm **扁平安装**官方发布包 `@deepseek-ai/dsh@0.1.1-rc.2`（`--ignore-scripts`，产物为纯真实目录、零链接）；
+2. 用 npm **扁平安装**官方发布包 `@deepseek-ai/dsh@0.1.2-alpha.2`（`--ignore-scripts`，产物为纯真实目录、零链接）；
+   想用 `latest` 标签版本可传 `-DshVersion "0.1.1-rc.2"`；
 3. 用系统自带 `csc` 编译 `launcher.cs` 生成 `启动 DeepSeek Harness.exe`；
 4. 复制文档，组装出 `dist\` 便携目录（可选 `-Zip` 打包）。
 
@@ -58,7 +59,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -Zip `
 
 :: 2. 官方运行时依赖
 mkdir dist && cd dist
-echo {"name":"dsh-portable-runtime","private":true,"dependencies":{"@deepseek-ai/dsh":"0.1.1-rc.2"}}> package.json
+echo {"name":"dsh-portable-runtime","private":true,"dependencies":{"@deepseek-ai/dsh":"0.1.2-alpha.2"}}> package.json
 npm install --ignore-scripts --no-audit --no-fund
 
 :: 3. 编译启动器（Windows 自带 .NET Framework 编译器）
@@ -81,6 +82,7 @@ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe ^
 ## 工作原理
 
 - 启动器（`launcher.cs`）通过 `DSH_HOME` 环境变量把用户数据根指向自身 `data\` 目录，实现数据完全隔离（不读写系统用户目录）；
+- **0.1.2-alpha 起 Web 界面启用一次性 token 鉴权**，直接访问 `http://127.0.0.1:3081` 会返回 401；启动器捕获 node 输出的 `dsh web: http://.../?token=...` 并打开该地址，浏览器换取 30 天会话 cookie 后后续启动照常（node 输出同步写入 `dsh-console.log`）；
 - 首次启动由官方 `dsh web` 自动初始化配置（`data\profiles\web`）并重建内部链接，全程无需联网；
 - node_modules 采用 npm 扁平安装（零 junction/symlink），因此 git clone、ZIP 解压、文件夹拷贝三种方式均不会产生损坏链接，这是"拷贝即用"的关键（pnpm 默认布局含数万个链接，分发后必然失效）。
 

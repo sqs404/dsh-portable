@@ -5,6 +5,9 @@
 # 本地数据与日志
 /data/
 /启动失败.log
+/build.log
+/dsh-console.log
+/boot-test.log
 
 # 系统与编辑器
 Thumbs.db
