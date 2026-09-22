@@ -16,8 +16,8 @@
     Node.js 版本，默认 v24.19.0。
 
 .PARAMETER DshVersion
-    官方 dsh 包版本，默认 0.1.2-alpha.2（官方最新版）。
-    如需回退到 latest 标签版本，传 -DshVersion "0.1.1-rc.2"。
+    官方 dsh 包版本，默认 0.1.6-alpha.2（官方最新发布版，2026-09-17）。
+    如需改用 latest 标签的 RC 版本，传 -DshVersion "0.1.5-rc.2"。
 
 .PARAMETER Registry
     npm 镜像源。国内网络可传 https://registry.npmmirror.com/。
@@ -48,7 +48,7 @@
 #>
 param(
     [string]$NodeVersion = "v24.19.0",
-    [string]$DshVersion = "0.1.2-alpha.2",
+    [string]$DshVersion = "0.1.6-alpha.2",
     [string]$Registry = "https://registry.npmjs.org/",
     [string]$NodeMirror = "https://nodejs.org/dist/",
     [string]$CacheDir = "",
@@ -82,8 +82,15 @@ if (-not (Test-Path (Join-Path $nodeRoot "node.exe"))) {
     $nodeUrl = "$NodeMirror$NodeVersion/node-$NodeVersion-win-x64.zip"
     New-Item -ItemType Directory -Path $work -Force | Out-Null
     Write-Host "    下载: $nodeUrl"
-    curl.exe -L --fail --retry 3 -o $nodeZip $nodeUrl
-    if ($LASTEXITCODE -ne 0) { Write-Host "下载 Node.js 失败，请检查网络或 -NodeMirror 参数" -ForegroundColor Red; exit 1 }
+    # curl / npm 的进度与告警都写 stderr，而本脚本开头设了 $ErrorActionPreference = "Stop"，
+    # PowerShell 会把原生命令的 stderr 升级成终止性错误（NativeCommandError）而中断构建，
+    # 故这两步临时切回 Continue，成败一律改由 $LASTEXITCODE 判定。
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    curl.exe -L --fail --retry 3 -sS -o $nodeZip $nodeUrl
+    $dlExit = $LASTEXITCODE
+    $ErrorActionPreference = $prevEap
+    if ($dlExit -ne 0) { Write-Host "下载 Node.js 失败，请检查网络或 -NodeMirror 参数" -ForegroundColor Red; exit 1 }
     Expand-Archive -Path $nodeZip -DestinationPath $work -Force
     # zip 内是 node-vX.Y.Z-win-x64 子目录，整目录作为 Node 根（含 node.exe 与 npm）
     $inner = Get-ChildItem $work -Directory | Where-Object { $_.Name -like "node-v*-win-x64" } | Select-Object -First 1
@@ -120,11 +127,14 @@ if (-not (Test-Path (Join-Path $nmDir "@deepseek-ai\dsh\lib\bin.js"))) {
     $env:npm_config_cache = $CacheDir
     Ok "npm 缓存: $CacheDir"
     $oldCwd = (Get-Location).Path
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     Set-Location $OutDir
     try {
         & $npm install --ignore-scripts --no-audit --no-fund
-        if ($LASTEXITCODE -ne 0) { Write-Host "npm install 失败，请检查网络或 -Registry 参数" -ForegroundColor Red; exit 1 }
-    } finally { Set-Location $oldCwd }
+        $npmExit = $LASTEXITCODE
+    } finally { Set-Location $oldCwd; $ErrorActionPreference = $prevEap }
+    if ($npmExit -ne 0) { Write-Host "npm install 失败，请检查网络或 -Registry 参数" -ForegroundColor Red; exit 1 }
     if (-not (Test-Path (Join-Path $nmDir "@deepseek-ai\dsh\lib\bin.js"))) {
         Write-Host "安装后未找到 @deepseek-ai/dsh 入口，构建中止" -ForegroundColor Red
         exit 1
@@ -136,9 +146,13 @@ Ok "运行时: $((Get-ChildItem $nmDir -Directory -Force | Measure-Object).Count
 $launcherExe = Join-Path $OutDir "启动 DeepSeek Harness.exe"
 if (-not (Test-Path $launcherExe)) {
     Step "编译启动器（csc）"
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     & $csc /nologo /target:winexe /r:System.Windows.Forms.dll `
         /out:$launcherExe (Join-Path $scriptDir "launcher.cs")
-    if ($LASTEXITCODE -ne 0) { Write-Host "启动器编译失败" -ForegroundColor Red; exit 1 }
+    $cscExit = $LASTEXITCODE
+    $ErrorActionPreference = $prevEap
+    if ($cscExit -ne 0) { Write-Host "启动器编译失败" -ForegroundColor Red; exit 1 }
 }
 Ok "启动器: $launcherExe"
 

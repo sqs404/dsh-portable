@@ -49,9 +49,9 @@ DeepSeek Harness 的 Windows 免安装版：
 ------------
   启动 DeepSeek Harness.exe   一键启动器（双击即用）
   node.exe                   内置 Node.js 运行时（v24.19.0）
-  node_modules\              全部程序包（npm 扁平安装，452 包 / 187 个顶层包）
+  node_modules\              全部程序包（npm 扁平安装，486 包 / 150 个顶层包）
   data\                      用户数据（配置、Key、会话；首次启动自动生成）
-  package.json               运行时清单（@deepseek-ai/dsh@0.1.2-alpha.2）
+  package.json               运行时清单（@deepseek-ai/dsh@0.1.6-alpha.2）
   dsh-console.log            程序运行日志（每次启动覆盖，启动失败时看它）
   LICENSE / THIRD_PARTY_NOTICES.md   许可证与第三方声明
   README.md / 使用说明.txt    使用文档

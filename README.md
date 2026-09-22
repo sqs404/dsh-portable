@@ -46,8 +46,8 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -Zip `
 脚本执行：
 
 1. 下载官方 **Node.js**（默认 v24.19.0）并取出 `node.exe`；
-2. 用 npm **扁平安装**官方发布包 `@deepseek-ai/dsh@0.1.2-alpha.2`（`--ignore-scripts`，产物为纯真实目录、零链接）；
-   想用 `latest` 标签版本可传 `-DshVersion "0.1.1-rc.2"`；
+2. 用 npm **扁平安装**官方发布包 `@deepseek-ai/dsh@0.1.6-alpha.2`（`--ignore-scripts`，产物为纯真实目录、零链接）；
+   想用 `latest` 标签的 RC 版本可传 `-DshVersion "0.1.5-rc.2"`；
 3. 用系统自带 `csc` 编译 `launcher.cs` 生成 `启动 DeepSeek Harness.exe`；
 4. 复制文档，组装出 `dist\` 便携目录（可选 `-Zip` 打包）。
 
@@ -59,7 +59,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -Zip `
 
 :: 2. 官方运行时依赖
 mkdir dist && cd dist
-echo {"name":"dsh-portable-runtime","private":true,"dependencies":{"@deepseek-ai/dsh":"0.1.2-alpha.2"}}> package.json
+echo {"name":"dsh-portable-runtime","private":true,"dependencies":{"@deepseek-ai/dsh":"0.1.6-alpha.2"}}> package.json
 npm install --ignore-scripts --no-audit --no-fund
 
 :: 3. 编译启动器（Windows 自带 .NET Framework 编译器）
