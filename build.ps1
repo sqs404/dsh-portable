@@ -16,8 +16,8 @@
     Node.js 版本，默认 v24.19.0。
 
 .PARAMETER DshVersion
-    官方 dsh 包版本，默认 0.1.6-alpha.2（官方最新发布版，2026-09-17）。
-    如需改用 latest 标签的 RC 版本，传 -DshVersion "0.1.5-rc.2"。
+    官方 dsh 包版本，默认 0.2.0-rc.2（官方 latest 标签，2026-09-29 发布）。
+    如需改用 alpha 标签的预览版本，传 -DshVersion "0.2.1-alpha.1"。
 
 .PARAMETER Registry
     npm 镜像源。国内网络可传 https://registry.npmmirror.com/。
@@ -48,7 +48,7 @@
 #>
 param(
     [string]$NodeVersion = "v24.19.0",
-    [string]$DshVersion = "0.1.6-alpha.2",
+    [string]$DshVersion = "0.2.0-rc.2",
     [string]$Registry = "https://registry.npmjs.org/",
     [string]$NodeMirror = "https://nodejs.org/dist/",
     [string]$CacheDir = "",
